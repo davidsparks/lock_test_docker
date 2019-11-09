@@ -1,0 +1,6 @@
+name = Lock test
+description = Lock test
+core = 7.x
+
+dependencies[] = background_process
+dependencies[] = redis

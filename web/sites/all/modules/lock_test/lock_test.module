@@ -1,0 +1,82 @@
+<?php
+
+// The number of background processes to trigger
+define('LOCK_TEST_PASSES', 25);
+
+// Cache ID for a counter.
+define('LOCK_TEST_COUNTER_CID', 'lock_test_counter');
+
+/**
+ * Implements hook_menu().
+ */
+function lock_test_menu() {
+  $items['lock-test'] = array(
+    'page callback' => 'lock_test_run',
+    'access callback' => TRUE,
+  );
+  return $items;
+}
+
+/**
+ * Menu callback
+ */
+function lock_test_run() {
+  $pass = 1;
+  cache_set(LOCK_TEST_COUNTER_CID, 1);
+  do {
+    $callback = 'lock_test_bgp';
+    background_process_start($callback, $pass);
+  } while (++$pass <= LOCK_TEST_PASSES);
+}
+
+/**
+ * Background process callback
+ */
+function lock_test_bgp($pass) {
+  // Count attempts at acquiring lock
+  static $attempt = 0;
+
+  // Attempt to acquire lock
+  $lock_name = 'lock_test';
+  if (!lock_acquire($lock_name)) {
+    // Wait until the lock is available
+    lock_wait($lock_name);
+    $attempt++;
+    // Recurse into callback
+    return lock_test_bgp($pass);
+  }
+
+  // Lock acquire time (seconds from last minute)
+  $a_time = _lock_test_time_in_seconds();
+
+  // Retrieve, increment and update the cached counter value
+  $cache_value = cache_get(LOCK_TEST_COUNTER_CID)->data;
+  $new_value = $cache_value + 1;
+  cache_set(LOCK_TEST_COUNTER_CID, $new_value);
+
+  // Release the lock
+  lock_release($lock_name);
+
+  // Lock release time (seconds from last minute)
+  $r_time = _lock_test_time_in_seconds();
+
+  $wd_vars = array(
+    '@pass' => str_pad($pass, 3, '0', STR_PAD_LEFT),
+    '@value' => str_pad($cache_value, 3, '0', STR_PAD_LEFT),
+    '@a_time' => number_format($a_time, 4),
+    '@r_time' => number_format($r_time, 4),
+    '@attempt' => $attempt > 0 ? ' (' . format_plural($attempt, '1 wait', '@count waits') . ')' : '',
+  );
+  watchdog('lock_test', "Pass @pass Value @value Acquired @a_time Released @r_time@attempt", $wd_vars, WATCHDOG_DEBUG);
+  return TRUE;
+}
+
+/**
+ * Returns the number of seconds into the current minute
+ */
+function _lock_test_time_in_seconds() {
+  $time = microtime(TRUE);
+  $minute = floor($time / 60) * 60;
+  $seconds = $time - $minute;
+  return $seconds;
+}
