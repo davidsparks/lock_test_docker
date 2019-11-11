@@ -1,4 +1,5 @@
 # Redis lock test
+The directory /web contains the full Drupal 7 codebase with the [lock_test module](https://github.com/davidsparks/lock_test_module) and its dependencies installed.
 
 ## Installation
 
