@@ -1,5 +1,7 @@
 # Redis lock test
-The directory /web contains the full Drupal 7 codebase with the [lock_test module](https://github.com/davidsparks/lock_test) and its dependencies installed.
+A complete docker-based Drupal 7 setup for testing Redis locks with multiple threads. See https://www.drupal.org/project/redis/issues/3093403.
+
+The directory /web contains the Drupal 7 codebase with the [lock_test module](https://github.com/davidsparks/lock_test) and its dependencies installed.
 
 ## Installation
 
