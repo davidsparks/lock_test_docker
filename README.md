@@ -30,7 +30,7 @@ Switch to Redis lock and run the tests again
 
 ## Results
 #### Test 1:
-
+<pre>
 64  09/Nov 12:15  debug     lock_test  Pass 001 Value 001 Acquired 3.6137 Released 3.6156  
 65  09/Nov 12:15  debug     lock_test  Pass 002 Value 002 Acquired 3.6777 Released 3.6807  
 66  09/Nov 12:15  debug     lock_test  Pass 004 Value 003 Acquired 3.7220 Released 3.7258  
@@ -56,12 +56,14 @@ Switch to Redis lock and run the tests again
 86  09/Nov 12:15  debug     lock_test  Pass 023 Value 023 Acquired 4.2761 Released 4.2793  
 87  09/Nov 12:15  debug     lock_test  Pass 024 Value 024 Acquired 4.3040 Released 4.3105 (1 wait)   
 88  09/Nov 12:15  debug     lock_test  Pass 025 Value 025 Acquired 4.3194 Released 4.3213  
- 
+</pre>
+
 'Acquired' and 'Released' show the current clock time in seconds.  
 Each thread waits for the lock to be released before acquiring it, and the counter is incremented correctly.  
 
 #### Test 2:
 
+<pre>
  89  09/Nov 12:18  debug     lock_test  Pass 002 Value 001 Acquired 7.5132 Released 7.5178 <--  
  90  09/Nov 12:18  debug     lock_test  Pass 001 Value 001 Acquired 7.5132 Released 7.5185 <-- Acquired before release  
  91  09/Nov 12:18  debug     lock_test  Pass 004 Value 002 Acquired 7.5859 Released 7.5933  
@@ -87,7 +89,6 @@ Each thread waits for the lock to be released before acquiring it, and the count
 111  09/Nov 12:18  debug     lock_test  Pass 023 Value 020 Acquired 8.0732 Released 8.0800  
 112  09/Nov 12:18  debug     lock_test  Pass 024 Value 021 Acquired 8.0819 Released 8.0861  
 113  09/Nov 12:18  debug     lock_test  Pass 025 Value 022 Acquired 8.1012 Released 8.1037  
+</pre>
 
-In the rows marked "<--", the lock has been acquired by a thread before being released by the previous thread.  
-The two threads have loaded the same value from cache, and both updated it to the same value.  
-The counter is 'missing' three counts.  
+In the rows marked "<--", the lock has been acquired by a thread before being released by the previous thread. The two threads have loaded the same value from cache, and both updated it to the same value. The counter is 'missing' three counts.  
